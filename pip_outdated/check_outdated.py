@@ -1,5 +1,5 @@
-import asyncio
 from dataclasses import dataclass
+from importlib.metadata import version
 from typing import List, Optional
 
 from packaging.requirements import Requirement
@@ -47,17 +47,7 @@ class OutdateResult:
         return self.version != self.wanted or self.version != self.latest
 
 async def get_local_version(name: str) -> Optional[Version]:
-    p = await asyncio.create_subprocess_shell(
-        f"pip show {name}",
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-        )
-    stdout, _ = await p.communicate()
-    if p.returncode != 0:
-        return None
-    for line in stdout.decode().splitlines():
-        if line.startswith("Version: "):
-            return parse_version(line[9:])
+    return parse_version(version(name))
         
 async def get_pypi_versions(name: str, session) -> List[Version]:
     async with session.get(f"https://pypi.org/pypi/{name}/json") as r:
