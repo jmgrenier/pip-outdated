@@ -3,6 +3,9 @@ import asyncio
 
 __version__ = "0.7.0"
 
+if sys.platform == 'win32':
+	asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 def parse_args():
     parser = argparse.ArgumentParser(
         prog="pip-outdated",
