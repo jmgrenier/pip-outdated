@@ -1,0 +1,68 @@
+[project]
+name = "pip-outdated"
+requires-python = ">=3.12"
+version = "0.7.0"
+description = "Find outdated dependencies in your requirements.txt or setup.cfg"
+authors = [{ name = "eight", email = "eight04@gmail.com" }]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.7",
+    "Topic :: Software Development :: Build Tools",
+]
+keywords = ["pip", "check", "outdate", "npm"]
+license = { text = "MIT" }
+readme = "README.rst"
+urls = { Homepage = "https://github.com/eight04/pip-outdated" }
+dependencies = [
+    "aiohttp~=3.10",
+    "colorama~=0.4.6",
+    "packaging~=24.1",
+    "termcolor~=2.4",
+    "terminaltables~=3.1",
+]
+
+[project.scripts]
+pip-outdated = "pip_outdated:main"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.ruff.lint]
+select = [
+    "A",     # flake8-builtins
+    "ASYNC", # flake8-async
+    "B",     # flake8-bugbear
+    "C4",    # flake8-comprehensions
+    "E4",    # pycodestyle imports
+    "E7",    # pycodestyle statements
+    "E9",    # pycodestyle io-error
+    "F",     # Pyflakes
+    "ICN",   # flake8-import-conventions
+    "ISC",   # flake8-implicit-str-concat
+    "LOG",   # flake8-logging
+    "NPY",   # NumPy-specific
+    "PIE",   # flake8-pie
+    "PTH",   # flake8-use-pathlib
+    "RET",   # flake8-return
+    "RUF",   # Ruff-specific
+    "RSE",   # flake8-raise
+    "SIM",   # flake8-simplify
+    "T10",   # flake8-debugger
+    "UP",    # pyupgrade
+]
+ignore = [
+    "F401",  # unused-import
+    "F841",  # unused-variable
+    "F842",  # unused-annotation
+    "UP032", # Use f-string instead of format call
+]
+extend-select = [
+    "I",
+] # Import sorting (is a linter rule, not a formatter rule; needs access to AST)
