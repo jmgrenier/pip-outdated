@@ -3,14 +3,16 @@ Find requirements.
 https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
 """
 
+import contextlib
 import pathlib
 import re
 from itertools import chain
 
-from packaging.requirements import Requirement, InvalidRequirement
-# https://github.com/conda/conda-build/issues/4428
+from packaging.requirements import InvalidRequirement, Requirement
 from setuptools.config.setupcfg import read_configuration
+
 from .verbose import verbose
+
 
 def iter_files(patterns):
     """Yield path.Path(file) from multiple glob patterns."""
@@ -19,10 +21,10 @@ def iter_files(patterns):
             yield pathlib.Path(pattern)
         else:
             yield from pathlib.Path(".").glob(pattern)
-                
+
+
 def iter_lines(file):
-    """Yield line from a file. Handle '#' comment and '\' continuation escape.
-    """
+    """Yield line from a file. Handle '#' comment and '\' continuation escape."""
     if verbose():
         print(f"Parse: {file}")
     pre_line = ""
@@ -42,42 +44,40 @@ def iter_lines(file):
                 continue
             yield pre_line + line
             pre_line = ""
-            
+
+
 def parse_requirements(file):
     for line in iter_lines(file):
         require = parse_require(line)
         if require:
             yield require
-            
+
+
 def parse_cfg(file):
     conf = read_configuration(file, ignore_option_errors=True)
     requires = []
-    
-    try:
+
+    with contextlib.suppress(KeyError):
         requires.extend(conf["options"]["setup_requires"])
-    except KeyError:
-        pass
-        
-    try:
+
+    with contextlib.suppress(KeyError):
         requires.extend(conf["options"]["install_requires"])
-    except KeyError:
-        pass
-        
-    try:
+
+    with contextlib.suppress(KeyError):
         requires.extend(chain.from_iterable(conf["options"]["extras_require"].values()))
-    except KeyError:
-        pass
-    
+
     for require in requires:
         require = parse_require(require)
         if require:
             yield require
-            
+
+
 def find_require(files):
     for file in iter_files(files):
         requires = parse_cfg(file) if file.suffix == ".cfg" else parse_requirements(file)
         yield from requires
-    
+
+
 def parse_require(text):
     # strip options
     match = re.match(r"(.*?)\s--?[a-z]", text)
@@ -87,4 +87,3 @@ def parse_require(text):
         return Requirement(text)
     except InvalidRequirement:
         return None
-    
