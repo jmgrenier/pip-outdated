@@ -20,6 +20,7 @@ dependencies = [
     "aiohttp~=3.10",
     "colorama~=0.4.6",
     "packaging~=24.1",
+    "setuptools~=72.1",
     "termcolor~=2.4",
     "terminaltables~=3.1",
 ]

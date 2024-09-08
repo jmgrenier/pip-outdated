@@ -160,6 +160,7 @@ dependencies = [
     { name = "aiohttp" },
     { name = "colorama" },
     { name = "packaging" },
+    { name = "setuptools" },
     { name = "termcolor" },
     { name = "terminaltables" },
 ]
@@ -169,8 +170,18 @@ requires-dist = [
     { name = "aiohttp", specifier = "~=3.10" },
     { name = "colorama", specifier = "~=0.4.6" },
     { name = "packaging", specifier = "~=24.1" },
+    { name = "setuptools", specifier = "~=72.1" },
     { name = "termcolor", specifier = "~=2.4" },
     { name = "terminaltables", specifier = "~=3.1" },
+]
+
+[[package]]
+name = "setuptools"
+version = "72.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ce/ef/013ded5b0d259f3fa636bf35de186f0061c09fbe124020ce6b8db68c83af/setuptools-72.2.0.tar.gz", hash = "sha256:80aacbf633704e9c8bfa1d99fa5dd4dc59573efcf9e4042c13d3bcef91ac2ef9", size = 2419230 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6e/ec/06715d912351edc453e37f93f3fc80dcffd5ca0e70386c87529aca296f05/setuptools-72.2.0-py3-none-any.whl", hash = "sha256:f11dd94b7bae3a156a95ec151f24e4637fb4fa19c878e4d191bfb8b2d82728c4", size = 2336658 },
 ]
 
 [[package]]
