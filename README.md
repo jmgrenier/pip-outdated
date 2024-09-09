@@ -1,6 +1,17 @@
 
 # pip-outdated
 
+## Fork
+
+### Changelog
+
+- 1.0.0
+  - Added support for reading dependencies from pyproject.toml files
+  - Set default DNS resolver for aiohttp.TCPConnector for faster DNS resolution
+  - Fixed SelectorEventLoop missing for win32
+  - Updated project metadata management using pyproject.toml and [uv](https://github.com/astral-sh/uv)
+  - Formatted code using Ruff, fully added type hints
+
 [![image](https://travis-ci.com/eight04/pip-outdated.svg?branch=master)](https://travis-ci.com/eight04/pip-outdated)
 
 [![image](https://codecov.io/gh/eight04/pip-outdated/branch/master/graph/badge.svg)](https://codecov.io/gh/eight04/pip-outdated)
