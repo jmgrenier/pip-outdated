@@ -47,7 +47,6 @@ async def _main() -> None:
     from .print_outdated import print_outdated
     from .session import get_session
 
-    print(args)
     requirements = find_requirements(args.pattern)
     async with get_session() as session:
         outdated_results = [
