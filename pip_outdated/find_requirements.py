@@ -83,8 +83,8 @@ def parse_requirement(line: str) -> Requirement | None:
     # strip options
     match = re.match(r"(.*?)\s--?[a-z]", line)
     if match:
-        text = match.group(1)
+        line = match.group(1)
     try:
-        return Requirement(text)
+        return Requirement(line)
     except InvalidRequirement:
         return None

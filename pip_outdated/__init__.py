@@ -19,10 +19,10 @@ def parse_args() -> argparse.Namespace:
         "-q", "--quiet", action="store_true", help="Don't return exit code 1 if not everything is up to date."
     )
     parser.add_argument(
-        "file",
+        "pattern",
         nargs="*",
         default=["requirements.txt", "setup.cfg", "pyproject.toml"],
-        metavar="<patterns>",
+        metavar="<pattern>",
         help="Read dependencies from requirements files. This option accepts glob pattern.",
     )
     return parser.parse_args()
@@ -47,7 +47,8 @@ async def _main() -> None:
     from .print_outdated import print_outdated
     from .session import get_session
 
-    requirements = find_requirements(args.patterns)
+    print(args)
+    requirements = find_requirements(args.pattern)
     async with get_session() as session:
         outdated_results = [
             asyncio.create_task(check_outdated(requirement, session))
