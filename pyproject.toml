@@ -21,7 +21,7 @@ readme = "README.rst"
 urls = { Homepage = "https://github.com/eight04/pip-outdated" }
 dependencies = [
     "aiohttp~=3.10",
-    "colorama~=0.4.6",
+    "colorama~=0.4",
     "packaging~=24.1",
     "setuptools~=74.1",
     "termcolor~=2.4",
