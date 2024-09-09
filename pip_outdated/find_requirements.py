@@ -5,6 +5,7 @@ https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
 
 import contextlib
 import re
+import tomllib
 from collections.abc import Iterator
 from itertools import chain
 from pathlib import Path
@@ -73,10 +74,34 @@ def parse_cfg_file(path: Path) -> Iterator[Requirement | None]:
             yield require
 
 
+def parse_pyproject_file(path) -> Iterator[Requirement | None]:
+    with path.open(mode='rb') as f:
+        conf = tomllib.load(f)
+
+    requires = []
+
+    with contextlib.suppress(KeyError):
+        requires.extend(conf["project"]["dependencies"])
+
+    with contextlib.suppress(KeyError):
+        for optional_requires in conf["project"]["optional-dependencies"].values():
+            requires.extend(optional_requires)
+
+    for require in requires:
+        require = parse_requirement(require)
+        if require:
+            yield require
+
+
 def find_requirements(patterns: str) -> Iterator[Requirement | None]:
     for path in iter_files(patterns):
-        requirement = parse_cfg_file(path) if path.suffix == ".cfg" else parse_requirements_file(path)
-        yield from requirement
+        if path.suffix == ".cfg":
+            requirements = parse_cfg_file(path)
+        elif path.suffix == ".toml":
+            requirements = parse_pyproject_file(path)
+        else:
+            requirements = parse_requirements_file(path)
+        yield from requirements
 
 
 def parse_requirement(line: str) -> Requirement | None:
