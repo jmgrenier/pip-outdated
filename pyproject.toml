@@ -17,7 +17,7 @@ classifiers = [
 ]
 keywords = ["pip", "check", "outdate", "npm"]
 license = { text = "MIT" }
-readme = "README.rst"
+readme = "README.md"
 urls = { Homepage = "https://github.com/jmgrenier/pip-outdated" }
 dependencies = [
     "aiohttp~=3.10",
