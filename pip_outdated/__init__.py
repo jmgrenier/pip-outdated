@@ -2,8 +2,6 @@ import argparse
 import asyncio
 import sys
 
-__version__ = "1.0.0"
-
 if sys.platform == 'win32':
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
