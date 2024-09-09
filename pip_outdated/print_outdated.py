@@ -39,8 +39,8 @@ async def print_outdated(results: list[Task[Result]], quiet: bool):
 
     data = [["Name", "Installed", "Wanted", "Latest"]]
     count = 0
-    for count, outdate in enumerate(results, 1):
-        row = make_row(await outdate)
+    for count, result in enumerate(results, 1):
+        row = make_row(await result)
         if row:
             data.append(row)
 

@@ -53,20 +53,22 @@ async def get_local_version(name: str) -> Version | None:
     return parse_version(version(name))
 
 
-async def get_pypi_versions(name: str, session) -> list[Version]:
-    async with session.get(f"https://pypi.org/pypi/{name}/json") as r:
-        r.raise_for_status()
-        keys = []
-        for s in (await r.json())["releases"]:
+async def get_pypi_versions(name: str, session: aiohttp.ClientSession) -> list[Version]:
+    async with session.get(f"https://pypi.org/pypi/{name}/json") as res:
+        res.raise_for_status()
+
+        versions = []
+        for s in (await res.json())["releases"]:
             try:
                 version = parse_version(s)
             except InvalidVersion:
                 continue
             if version.is_prerelease:
                 continue
-            keys.append(version)
-        keys.sort()
-        return keys
+            versions.append(version)
+
+        versions.sort()
+        return versions
 
 
 async def check_outdated(dependency: Requirement, session: aiohttp.ClientSession) -> Result:
