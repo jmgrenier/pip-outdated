@@ -2,7 +2,7 @@
 name = "pip-outdated"
 requires-python = ">=3.12"
 version = "1.0.0"
-description = "Find outdated dependencies in your requirements.txt or setup.cfg"
+description = "Find outdated dependencies in your requirements.txt, setup.cfg or pyproject.toml files"
 authors = [
     { name = "eight", email = "eight04@gmail.com" },
     { name = 'Jean-Michel Grenier' },
@@ -18,7 +18,7 @@ classifiers = [
 keywords = ["pip", "check", "outdate", "npm"]
 license = { text = "MIT" }
 readme = "README.rst"
-urls = { Homepage = "https://github.com/eight04/pip-outdated" }
+urls = { Homepage = "https://github.com/jmgrenier/pip-outdated" }
 dependencies = [
     "aiohttp~=3.10",
     "colorama~=0.4",
