@@ -4,9 +4,10 @@ https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
 """
 
 import contextlib
-import pathlib
 import re
+from collections.abc import Iterator
 from itertools import chain
+from pathlib import Path
 
 from packaging.requirements import InvalidRequirement, Requirement
 from setuptools.config.setupcfg import read_configuration
@@ -14,21 +15,21 @@ from setuptools.config.setupcfg import read_configuration
 from .verbose import verbose
 
 
-def iter_files(patterns):
-    """Yield path.Path(file) from multiple glob patterns."""
+def iter_files(patterns: str) -> Iterator[Path]:
+    """Yield path.Path(pattern) from multiple glob patterns."""
     for pattern in patterns:
-        if pathlib.Path(pattern).is_file():
-            yield pathlib.Path(pattern)
+        if Path(pattern).is_file():
+            yield Path(pattern)
         else:
-            yield from pathlib.Path(".").glob(pattern)
+            yield from Path(".").glob(pattern)
 
 
-def iter_lines(file):
+def iter_lines(path: Path) -> Iterator[str]:
     """Yield line from a file. Handle '#' comment and '\' continuation escape."""
     if verbose():
-        print(f"Parse: {file}")
+        print(f"Parse: {path}")
     pre_line = ""
-    with file.open("r", encoding="utf-8") as f:
+    with path.open("r", encoding="utf-8") as f:
         for line in f:
             match = re.match(r"(.*?)(^|\s)#", line)
             if match:
@@ -46,15 +47,15 @@ def iter_lines(file):
             pre_line = ""
 
 
-def parse_requirements(file):
-    for line in iter_lines(file):
-        require = parse_require(line)
+def parse_requirements_file(path: Path) -> Iterator[Requirement | None]:
+    for line in iter_lines(path):
+        require = parse_requirement(line)
         if require:
             yield require
 
 
-def parse_cfg(file):
-    conf = read_configuration(file, ignore_option_errors=True)
+def parse_cfg_file(path: Path) -> Iterator[Requirement | None]:
+    conf = read_configuration(path, ignore_option_errors=True)
     requires = []
 
     with contextlib.suppress(KeyError):
@@ -67,20 +68,20 @@ def parse_cfg(file):
         requires.extend(chain.from_iterable(conf["options"]["extras_require"].values()))
 
     for require in requires:
-        require = parse_require(require)
+        require = parse_requirement(require)
         if require:
             yield require
 
 
-def find_require(files):
-    for file in iter_files(files):
-        requires = parse_cfg(file) if file.suffix == ".cfg" else parse_requirements(file)
-        yield from requires
+def find_requirements(patterns: str) -> Iterator[Requirement | None]:
+    for path in iter_files(patterns):
+        requirement = parse_cfg_file(path) if path.suffix == ".cfg" else parse_requirements_file(path)
+        yield from requirement
 
 
-def parse_require(text):
+def parse_requirement(line: str) -> Requirement | None:
     # strip options
-    match = re.match(r"(.*?)\s--?[a-z]", text)
+    match = re.match(r"(.*?)\s--?[a-z]", line)
     if match:
         text = match.group(1)
     try:

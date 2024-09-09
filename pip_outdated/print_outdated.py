@@ -1,45 +1,45 @@
 import sys
-from collections.abc import Awaitable
+from asyncio import Task
 
 import colorama
 from termcolor import colored
 from terminaltables import AsciiTable as Table
 
-from .check_outdated import OutdateResult
+from .check_outdated import Result
 
 
-def make_row(outdate: OutdateResult) -> list[str] | None:
-    if not outdate.outdated():
+def make_row(result: Result) -> list[str] | None:
+    if not result.outdated:
         return None
 
     def colored_current():
-        if outdate.install_not_found() or outdate.install_not_wanted():
-            return colored(str(outdate.version), "red", attrs=["bold"])
-        return str(outdate.version)
+        if result.install_not_found or result.install_not_wanted:
+            return colored(str(result.version), "red", attrs=["bold"])
+        return str(result.version)
 
     def colored_wanted():
-        if outdate.pypi_not_found() or not outdate.wanted:
+        if result.pypi_not_found or not result.wanted:
             return colored("None", "red", attrs=["bold"])
-        if not outdate.install_not_found() and outdate.version < outdate.wanted:
-            return colored(str(outdate.wanted), "green", attrs=["bold"])
-        return str(outdate.wanted)
+        if not result.install_not_found and result.version < result.wanted:  # type: ignore
+            return colored(str(result.wanted), "green", attrs=["bold"])
+        return str(result.wanted)
 
     def colored_latest():
-        if outdate.pypi_not_found():
+        if result.pypi_not_found:
             return colored("None", "red", attrs=["bold"])
-        if not outdate.install_not_found() and outdate.version < outdate.latest:
-            return colored(str(outdate.latest), "green", attrs=["bold"])
-        return str(outdate.latest)
+        if not result.install_not_found and result.version < result.latest:  # type: ignore
+            return colored(str(result.latest), "green", attrs=["bold"])
+        return str(result.latest)
 
-    return [outdate.name, colored_current(), colored_wanted(), colored_latest()]
+    return [result.name, colored_current(), colored_wanted(), colored_latest()]
 
 
-async def print_outdated(outdates: list[Awaitable[OutdateResult]], quiet: bool):
+async def print_outdated(results: list[Task[Result]], quiet: bool):
     colorama.init()
 
     data = [["Name", "Installed", "Wanted", "Latest"]]
     count = 0
-    for count, outdate in enumerate(outdates, 1):
+    for count, outdate in enumerate(results, 1):
         row = make_row(await outdate)
         if row:
             data.append(row)
