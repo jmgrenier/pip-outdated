@@ -2,9 +2,6 @@ import argparse
 import asyncio
 import sys
 
-if sys.platform == 'win32':
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -26,11 +23,17 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def _windows_selector_loop_factory() -> asyncio.AbstractEventLoop:
+    loop = asyncio.SelectorEventLoop()
+    asyncio.set_event_loop(loop)
+    return loop
+
+
 def main() -> None:
-    # FIXME: we can't use asyncio.run since it closes the event loop
-    # https://github.com/aio-libs/aiohttp/issues/1925
-    # asyncio.run(_main())
-    asyncio.get_event_loop().run_until_complete(_main())
+    if sys.platform == 'win32':
+        asyncio.run(_main(), loop_factory=_windows_selector_loop_factory)
+    else:
+        asyncio.run(_main())
 
 
 async def _main() -> None:
