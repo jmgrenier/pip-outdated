@@ -1,6 +1,6 @@
 import contextlib
 from dataclasses import dataclass
-from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError, version
 
 import aiohttp
 from packaging.requirements import Requirement
@@ -50,7 +50,18 @@ class Result:
 
 
 async def get_local_version(name: str) -> Version | None:
-    return parse_version(version(name))
+    try:
+        local_version = version(name)
+    except PackageNotFoundError:
+        return None
+
+    if local_version is None:
+        return None
+
+    try:
+        return parse_version(local_version)
+    except InvalidVersion:
+        return None
 
 
 async def get_pypi_versions(name: str, session: aiohttp.ClientSession) -> list[Version]:
