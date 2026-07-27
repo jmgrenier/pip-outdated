@@ -27,20 +27,35 @@ From [pypi](https://pypi.org/project/pip-outdated/)
 
 ## Usage
 
-    usage: pip-outdated [-h] [-v] [-q] [<file> [<file> ...]]
+    usage: pip-outdated [-h] [-v] [-q] [--exclude-newer <date-or-duration>]
+                        [<pattern> ...]
 
-    Find outdated dependencies in your requirements.txt or setup.cfg file.
+    Find outdated dependencies in your requirements.txt, setup.cfg or
+    pyproject.toml file.
 
     positional arguments:
-      <file>         Read dependencies from requirements files. This option
+      <pattern>      Read dependencies from requirements files. This option
                      accepts glob pattern. (default: ['requirements.txt',
-                     'setup.cfg'])
+                     'setup.cfg', 'pyproject.toml'])
 
     optional arguments:
       -h, --help     show this help message and exit
       -v, --verbose  Print verbose information. (default: False)
       -q, --quiet    Don't return exit code 1 if not everything is up to date.
                      (default: False)
+      --exclude-newer <date-or-duration>
+                     Only consider distributions uploaded by this date. Accepts
+                     an RFC 3339 timestamp, a local date, or a cooldown duration
+                     such as '2 weeks' or 'P14D'. (default: None)
+
+Apply the same two-week dependency cooldown as an installer configured with
+`exclude-newer = "2 weeks"`:
+
+    pip-outdated --exclude-newer "2 weeks"
+
+The cutoff is applied to each distribution artifact's PyPI upload timestamp.
+A package version is considered available when at least one of its artifacts
+was uploaded by the cutoff.
 
 Check multiple files e.g. `test-requirements.txt` and
 `dev-requirements.txt`:

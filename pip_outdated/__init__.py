@@ -1,26 +1,45 @@
 import argparse
 import asyncio
 import sys
+from collections.abc import Sequence
+
+from .exclude_newer import parse_exclude_newer
 
 
-def parse_args() -> argparse.Namespace:
+def _exclude_newer_argument(value: str):
+    try:
+        return parse_exclude_newer(value)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError(str(error)) from error
+
+
+def parse_args(args: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        prog="pip-outdated",
-        description="Find outdated dependencies in your requirements.txt, setup.cfg or pyproject.toml file.",
+        prog='pip-outdated',
+        description='Find outdated dependencies in your requirements.txt, setup.cfg or pyproject.toml file.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument("-v", "--verbose", action="store_true", help="Print verbose information.")
+    parser.add_argument('-v', '--verbose', action='store_true', help='Print verbose information.')
     parser.add_argument(
-        "-q", "--quiet", action="store_true", help="Don't return exit code 1 if not everything is up to date."
+        '-q', '--quiet', action='store_true', help="Don't return exit code 1 if not everything is up to date."
     )
     parser.add_argument(
-        "pattern",
-        nargs="*",
-        default=["requirements.txt", "setup.cfg", "pyproject.toml"],
-        metavar="<pattern>",
-        help="Read dependencies from requirements files. This option accepts glob pattern.",
+        '--exclude-newer',
+        type=_exclude_newer_argument,
+        metavar='<date-or-duration>',
+        help=(
+            'Only consider distributions uploaded by this date. Accepts an RFC 3339 timestamp, '
+            "a local date, or a cooldown duration such as '2 weeks' or 'P14D'."
+        ),
     )
-    return parser.parse_args()
+    parser.add_argument(
+        'pattern',
+        nargs='*',
+        default=['requirements.txt', 'setup.cfg', 'pyproject.toml'],
+        metavar='<pattern>',
+        help='Read dependencies from requirements files. This option accepts glob pattern.',
+    )
+    return parser.parse_args(args)
 
 
 def _windows_selector_loop_factory() -> asyncio.AbstractEventLoop:
@@ -51,7 +70,7 @@ async def _main() -> None:
     requirements = find_requirements(args.pattern)
     async with get_session() as session:
         outdated_results = [
-            asyncio.create_task(check_outdated(requirement, session))
+            asyncio.create_task(check_outdated(requirement, session, args.exclude_newer))
             for requirement in requirements
             if requirement is not None
         ]
